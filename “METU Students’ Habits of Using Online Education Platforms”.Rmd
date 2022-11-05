@@ -1,0 +1,117 @@
+---
+title: "SURVEY SAMPLING TECHNIQUES- “METU Students’ Habits of Using Online Education Platforms"
+author: "AyşegülBinbaş"
+date: "20 12 2020"
+output: word_document
+---
+```{r}
+library(readxl)
+data<-read_excel("data.xlsx")
+head(data)
+```
+colnames(data)<-c("time","e-mail","gender","age","faculty","grade","using_online_edc","which_are_most_used","how_often","what_purpose","for_which_field","payoff","how_much_money_spent","satisfaction_from_spent_money","what_differs_from_others","satisfaction_of_platforms","want_to_add_smth")
+head(data)
+library(ggplot2)
+table(data$gender)
+data1<- data.frame(
+  gender=c("Male","Female","PanSexual","TransSexual"),  
+  count=c(42,56,1,1)
+  )
+ggplot(data1, aes(x=gender, y=count)) + 
+  geom_bar(stat = "identity",fill="red",colour="black")+
+  ggtitle("Bar Plot of Gender")+
+  geom_text(aes(label=count), vjust=-0.3, size=3.5)+
+  theme_minimal()
+table(data$age)
+library(plotrix)
+age<-c("17-22","23-28")
+freq1<-c(70,30)
+percentage<-round(freq1/sum(freq1)*100)
+labels_new<-paste(age,' ',percentage)
+labels_new
+final_labels<-paste(labels_new,'%',sep = "")
+final_labels
+pie3D(freq1,labels = final_labels,explode = 0.3,main='Pie Chart of Age',labelcex = 1.8,shade = 0.5,radius = .9)
+library(gcookbook)
+table(data$grade)
+grade<-c("Preparatory","1st grade","2nd grade","3rd grade","4th grade")
+freq<-c(4,12,47,24,13)
+data3<- data.frame(grade,freq)
+ggplot(data3,aes(x=factor(grade),y=freq))+
+  geom_bar(stat="identity",fill="blue",colour="black")+
+  ggtitle("Bar Plot of Grades")
+table(data$faculty)
+library(plotrix)
+faculty<-c("Architecture","Education","Engineering","Economics and Administrative Sciences","Arts and Science")
+freq2<-c(3,9,16,23,49)
+percentage<-round(freq2/sum(freq2)*100)
+labels_new<-paste(faculty,' ',percentage)
+labels_new
+final_labels<-paste(labels_new,'%',sep = "")
+final_labels
+pie3D(freq2,labels = final_labels,explode = 0.2,main='Pie Chart of Faculty',labelcex =1.2,shade = 0.7,radius = .8)
+dataa<-read_excel("data.xlsx")
+head(dataa)
+colnames(dataa)<-c("time","e-mail","gender","age","faculty","grade","using_online_edc","which_are_most_used","how_often","what_purpose","for_which_field","payoff","how_much_money_spent","satisfaction_from_spent_money","what_differs_from_others","satisfaction_of_platforms","want_to_add_smth")
+#HYPO 1: There is an association between the grades of METU Students’ and using online education platforms. (Q5 & Q6)
+table(dataa$grade,dataa$using_online_edc)
+df<-as.data.frame(table(dataa$grade,dataa$using_online_edc))
+colnames(df)<-c("Grades","Using","Frequencies")
+ggplot(df,aes(x=as.factor(Using),y=Frequencies))+
+  geom_bar(stat="identity",fill="blue",colour="black")+
+  ggtitle("Bar Plot of Grades & Using Online Educ. Plat.")+
+  facet_wrap(~Grades)
+#H0: The two variables are independent.
+#H1: The two variables relate to each other.
+```{r}
+chisq.test(table(dataa$grade, dataa$using_online_edc))
+```
+#HYPO 2: Female students are more tend to use online education platforms than others. (Q2 & Q6)
+table(dataa$gender,dataa$using_online_edc)
+chisq.test(table(dataa$gender,dataa$using_online_edc))
+df<-as.data.frame(table(dataa$gender,dataa$using_online_edc))
+colnames(df)<-c("Gender","Using","Frequencies")
+ggplot(df,aes(x=as.factor(Using),y=Frequencies))+
+  geom_bar(stat="identity",fill="chocolate",colour="black")+
+  ggtitle("Bar Plot of Gender & Using Online Educ. Plat.")+
+  facet_wrap(~Gender)
+#hypo3: There is an association between the Faculties of students and using online education platforms. (Q4 & Q6)
+table(dataa$faculty,dataa$using_online_edc)
+chisq.test(table(dataa$faculty,dataa$using_online_edc))
+df<-as.data.frame(table(dataa$faculty,dataa$using_online_edc))
+colnames(df)<-c("Faculty","Using","Frequencies")
+ggplot(df,aes(x=as.factor(Using),y=Frequencies))+
+  geom_bar(stat="identity",fill="darkcyan",colour="black")+
+  ggtitle("Bar Plot of Faculty & Using Online Educ. Plat.")+
+  facet_wrap(~Faculty)
+#Hypo 6: Students who pay fewer fees are more satisfied from online education platform they use. (Q12 & Q15)
+x<-dataa$how_much_money_spent
+y<-dataa$satisfaction_of_platforms
+z<-dataa$using_online_edc
+notusing<-which(z==2)
+x<-x[-notusing]
+y<-y[-notusing]
+length(which(is.na(y)))
+length(which(is.na(x)))
+summary(y)
+summary(x)
+nas<-which(is.na(x))
+y[17]=3
+x[nas]=1
+table(x,y)
+chisq.test(table(x,y))
+#Hypo 7:There is an association between the students’ faculties and whether or not they pay some fee for online education platforms. (Q4 & Q11)
+x<- dataa$faculty
+y<- dataa$payoff
+z<-dataa$using_online_edc
+notusing<-which(z==2)
+x<-x[-notusing]
+y<-y[-notusing]
+length(which(is.na(y)))
+length(which(is.na(x)))
+summary(y)
+summary(x)
+nas<-which(is.na(y))
+y[nas]=1
+table(x,y)
+chisq.test(table(x,y))
